@@ -1,9 +1,32 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const utils = require('../utils/utils');
 
+// eslint-disable-next-line consistent-return
 exports.authUser = (req, res) => {
-  console.log('Load User Called');
+  if (req.headers && req.headers.authorization) {
+    const authorization = req.headers.authorization.split(' ')[1];
+    try {
+      // eslint-disable-next-line no-undef
+      decoded = jwt.verify(authorization, process.env.JWT_SECRET);
+    } catch (e) {
+      return res.status(401).send('Invalid User. Cannot Load');
+    }
+    // eslint-disable-next-line no-undef
+    const userId = decoded.sub;
+    User.findOne({ where: { id: userId } }).then((user) => {
+      const loadedUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      };
+      res.status(200).json({
+        loadedUser,
+        msg: 'User Loaded Successfully',
+      });
+    });
+  }
 };
 
 exports.signup = (req, res) => {

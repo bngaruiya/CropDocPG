@@ -1,11 +1,17 @@
 const express = require('express');
 const cors = require('cors');
+const passport = require('passport');
 
 const userRoutes = require('./routes/users');
 const uploadRoutes = require('./routes/upload');
 const businessRoutes = require('./routes/business');
 
 const app = express();
+
+// Passport Authentication
+require('./config/passportJWT')(passport);
+
+app.use(passport.initialize());
 
 app.use(cors());
 app.use(express.json());
